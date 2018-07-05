@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- 
+		原生 css3   jquery
+	 -->
+	<title>三种方法实现移动</title>
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/fontawesome-all.css">
+	<link rel="stylesheet" href="css/common.css">
+	<link rel="stylesheet" href="css/index.css">
+	<style type="text/css">
+		button{
+			width: 50px;
+			height: 50px;
+
+		}
+		div{
+			width: 200px;
+			height: 200px;
+			background: red;
+			position: absolute;
+			top: 50px;
+			left: 50px;
+		}
+	</style>
+	
+</head>
+<body>
+		<button>&lt;</button>
+	<button>&gt;</button>
+
+	<div></div>
+</body>
+<script src="js/jquery-1.12.4.js"></script>
+<script src="js/transition.js"></script>
+<script type="text/javascript">
+		(function($){
+			function Slient($elem){
+				this.$elem=$elem;
+				this.$elem.removeClass('transition');
+				this.currentX= parseFloat(this.$elem.css('left'));
+				this.currentY= parseFloat(this.$elem.css('top'));
+			}
+			Slient.prototype = { 
+				constructor:Slient,
+				to:function(x,y){
+					x=(typeof x== 'number') ? x:this.currentX;
+					y=(typeof y== 'number') ? y:this.currentY;
+					if (this.currentX==x&& this.currentY==y) 
+						return ;
+					this.$elem.trigger('move');
+					this.$elem.css({
+						top:y,
+						left:x,
+					});
+					this.$elem.trigger('moved');
+					this.currentX=x;
+					this.currentY=y;
+				},
+				x:function(x){
+					this.to(x);
+
+				},
+				y:function(y){
+					this.to(null,y);
+
+				}
+			}
+				
+
+			function css3($elem){
+				this.$elem=$elem;
+				this.$elem.addClass('transition');
+				this.currentX= parseFloat(this.$elem.css('left'));
+				this.currentY= parseFloat(this.$elem.css('top'));
+				//初始化
+				this.$elem.css({
+					left:this.currentX,
+					top:this.currentY
+				});
+
+			}
+			css3.prototype = {
+				constructor:css3,
+				to:function(x,y){
+					var self= this;
+					x=(typeof x== 'number') ? x:this.currentX;
+					y=(typeof y== 'number') ? y:this.currentY;
+					if (this.currentX==x&& this.currentY==y) 
+						return ;
+					this.$elem.trigger('move');
+					//监听过度事件
+					this.$elem.off(kuazhu.transition.end)
+					.one(kuazhu.transition.end,function(){
+						self.$elem.trigger('moved');
+					});
+
+					this.$elem.css({
+						top:y,
+						left:x,
+					});
+		
+					this.currentX=x;
+					this.currentY=y;
+				},
+				x:function(x){
+					this.to(x);
+
+				},
+				y:function(y){
+					this.to(null,y);
+
+				}
+			}
+
+			function js($elem){
+				this.$elem=$elem;
+				this.$elem.removeClass('transition');
+				this.currentX= parseFloat(this.$elem.css('left'));
+				this.currentY= parseFloat(this.$elem.css('top'));
+			}
+			js.prototype = {
+				constructor:js,
+				to:function(x,y){
+					var self= this;
+					x=(typeof x== 'number') ? x:this.currentX;
+					y=(typeof y=='number') ? y:this.currentY;
+					if (this.currentX==x&& this.currentY==y) 
+						return ;
+					this.$elem.trigger('move');
+					//监听过度事件
+					this.$elem.stop()
+					.animate({
+						left:x,
+						top:y},
+						function(){
+						self.$elem.trigger('moved');
+					});
+		
+					this.currentX=x;
+					this.currentY=y;
+				},
+				x:function(x){
+					this.to(x);
+
+				},
+				y:function(y){
+					this.to(null,y);
+
+				}
+			}
+	
+			var move = new js($('div'));
+
+			$('div').on('move moved',function(ev){
+				console.log(ev.type);
+			})
+			$('button').eq(0).on('click',function(){
+				//move.to(100,100);
+				// move.to(100);
+				 move.x(100);
+				// move.y(100);
+
+			});
+			$('button').eq(1).on('click',function(){
+				//move.to(300,333);
+				// move.to(333);
+				 move.x(333);
+				// move.y(333);
+			})
+
+			/*
+			var obj= new Slient($('div'));
+				$('button').eq(0).on('click',function(){
+					//alert(134);
+					obj.move(222,222);
+				})
+				$('button').eq(1).on('click',function(){
+							//alert(1);
+	 				obj.move(100,100);
+				})
+				*/
+
+
+		})(jQuery)
+	</script>
+</html>

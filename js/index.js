@@ -6,10 +6,26 @@
 */
 ;(function($){
 
+	function loadHtmlOnce($elem,callBack){
+		//获取需要请求的地址
+		var loadUrl = $elem.data('load');
+		//如果页面上没有设置请求地址直接返回
+		if(!loadUrl) return;
+
+		var isLoaded = $elem.data('isLoaded');
+		//如果已经加载过数据了直接返回
+		if(isLoaded) return;		
+		//如果有请求地址,发送请求获取数据
+		$.getJSON(loadUrl,function(data){
+			console.log('get data ...',data);
+			callBack($elem,data);
+		});		
+	}
 	/*顶部下拉菜单开始*/
 	var $menu = $('.nav-site .dropdown');
 	
 	$menu.on('dropdown-show',function(ev){
+	/*	
 		// console.log(this);
 		var $this = $(this);
 		//当需要显示时从服务器获取数据并且加载
@@ -26,6 +42,7 @@
 		//如果有请求地址,发送请求获取数据
 		$.getJSON(loadUrl,function(data){
 			console.log(data);
+			
 			var html = '';
 			for(var i = 0;i<data.length;i++){
 				html += '<li><a href="'+data[i].url+'" class="menu-item">'+data[i].name+'</a></li>';
@@ -36,9 +53,24 @@
 				$this.data('isLoaded',true);
 			},1000);
 		});
+	*/
+		loadHtmlOnce($(this),buildmenuitem)
+
+		
+
 
 	});
-	
+	function buildmenuitem($elem,data){
+			var html = '';
+			for(var i = 0;i<data.length;i++){
+				html += '<li><a href="'+data[i].url+'" class="menu-item">'+data[i].name+'</a></li>';
+			}
+			//模拟网络延时
+			setTimeout(function(){
+				$elem.find('.dropdown-layer').html(html);
+				$elem.data('isLoaded',true);
+			},1000);
+		}
 	$menu.dropdown({
 		css3:false,
 		js:true,
@@ -94,6 +126,7 @@
 	var $category = $('.category .dropdown');
 
 	$category.on('dropdown-show',function(ev){
+	/*
 		// console.log(this);
 		var $this = $(this);
 		//当需要显示时从服务器获取数据并且加载
@@ -110,37 +143,6 @@
 		//如果有请求地址,发送请求获取数据
 		$.getJSON(loadUrl,function(data){
 
-			/*
-				[
-					{
-						"title": "电视",//dt
-						"items": [//dd
-							"抢亿元红包",
-							"合资品牌",
-							"国产品牌",
-							"互联网品牌"
-						]
-					},
-					{
-						"title": "洗衣机",//dt
-						"items": [//dd
-							"抢亿元红包",
-							"合资品牌",
-							"国产品牌",
-							"互联网品牌"
-						]
-					},					
-				]
-						<dl class="category-details clearfix">
-							<dt class="category-details-title fl">
-								<a href="#" class="category-details-title-link">电视</a>
-							</dt>
-							<dd class="category-details-item fl">
-								<a href="#" class="link">曲面电视</a>
-								<a href="#" class="link">超薄电视</a>					
-							</dd>
-						</dl>				
-			*/
 			var html = '';
 			for(var i = 0;i<data.length;i++){
 				html += '<dl class="category-details clearfix"><dt class="category-details-title fl"><a href="#" class="category-details-title-link">'+data[i].title+'</a></dt><dd class="category-details-item fl">';
@@ -155,8 +157,25 @@
 				$this.data('isLoaded',true);
 			},1000);
 		});
+	*/
+		loadHtmlOnce($(this),buildcateitem);
 
 	});
+	function buildcateitem($elem,data){
+		var html = '';
+			for(var i = 0;i<data.length;i++){
+				html += '<dl class="category-details clearfix"><dt class="category-details-title fl"><a href="#" class="category-details-title-link">'+data[i].title+'</a></dt><dd class="category-details-item fl">';
+				for(var j = 0;j<data[i].items.length;j++){
+					html += '<a href="#" class="link">'+data[i].items[j]+'</a>'
+				}
+				html += '</dd></dl>';
+			}
+			//模拟网络延时
+			setTimeout(function(){
+				$elem.find('.dropdown-layer').html(html);
+				$elem.data('isLoaded',true);
+			},1000);
+	}
 	$category.dropdown({
 		css3:false,
 		js:true,
@@ -164,5 +183,14 @@
 	});
 
 	/*分类导航结束*/
+
+	/*中心轮播图开始*/
+	var $focusCarousel = $('.focus .carousel-container');
+	/*调用轮播图插件*/
+	$focusCarousel.carousel({
+		activeIndex:0,
+		interval:0
+	})
+	/*中心轮播图结束*/
 
 })(jQuery);
